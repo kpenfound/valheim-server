@@ -9,6 +9,9 @@ world_name     = "HashiWorld"
 world_password = "hunter2"
 ```
 - terraform apply
+- In Steam, go to View > Servers > Favorites > Add Server
+- Add your server at {ECS Instance IP}:2457
+- Open valheim, select the server, and click connect!
 
 
 ### Important notes
