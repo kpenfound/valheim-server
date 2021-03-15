@@ -153,3 +153,8 @@ DEFINITION
     host_path = "/home/ec2-user/valheim/backups"
   }
 }
+
+resource "aws_s3_bucket" "backups" {
+  bucket_prefix = "valheim-backup-${lower(var.world_name)}"
+  acl    = "private"
+}
