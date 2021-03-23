@@ -39,11 +39,17 @@ variable "world_backup" {
   default = 1
 }
 variable "world_backup_schedule" {
-  default = "0 1 * * *"
+  default = "0 */6 * * *"
 }
 variable "world_backup_remove_old" {
   default = 1
 }
 variable "world_backup_days_to_live" {
   default = 3
+}
+variable "world_update" {
+  default = 1
+}
+variable "world_update_schedule" {
+  default = "0 6 * * *"
 }

@@ -48,6 +48,9 @@ resource "aws_ecs_service" "service" {
   task_definition = aws_ecs_task_definition.task.arn
   desired_count   = 1
 
+  deployment_maximum_percent = 100
+  deployment_minimum_healthy_percent = 0
+
   ordered_placement_strategy {
     type  = "binpack"
     field = "cpu"
@@ -63,40 +66,56 @@ resource "aws_ecs_task_definition" "task" {
     "cpu": ${var.task_cpu},
     "environment": [
         {
-            "name": "NAME",
-            "value": "${var.world_name}"
+          "name": "NAME",
+          "value": "${var.world_name}"
         },
         {
-            "name": "WORLD",
-            "value": "${var.world_name}"
+          "name": "WORLD",
+          "value": "${var.world_name}"
         },
         {
-            "name": "PASSWORD",
-            "value": "${var.world_password}"
+          "name": "PASSWORD",
+          "value": "${var.world_password}"
         },
         {
-            "name": "PUBLIC",
-            "value": "${var.world_public}"
+          "name": "PUBLIC",
+          "value": "${var.world_public}"
         },
         {
-            "name": "TZ",
-            "value": "${var.world_tz}"
+          "name": "TZ",
+          "value": "${var.world_tz}"
         },
         {
-            "name": "AUTO_BACKUP",
-            "value": "${var.world_backup}"
+          "name": "AUTO_BACKUP",
+          "value": "${var.world_backup}"
         },
         {
-            "name": "AUTO_BACKUP_SCHEDULE",
-            "value": "${var.world_backup_schedule}"
+          "name": "AUTO_BACKUP_SCHEDULE",
+          "value": "${var.world_backup_schedule}"
         },
         {
-            "name": "AUTO_BACKUP_REMOVE_OLD",
-            "value": "${var.world_backup_remove_old}"
+          "name": "AUTO_BACKUP_REMOVE_OLD",
+          "value": "${var.world_backup_remove_old}"
         },
         {
-            "name": "AUTO_BACKUP_DAYS_TO_LIVE",
-            "value": "${var.world_backup_days_to_live}"
+          "name": "AUTO_BACKUP_DAYS_TO_LIVE",
+          "value": "${var.world_backup_days_to_live}"
+        },
+        {
+          "name": "AUTO_UPDATE",
+          "value": "${var.world_update}"
+        },
+        {
+          "name": "AUTO_UPDATE_SCHEDULE",
+          "value": "${var.world_update_schedule}"
+        },
+        {
+          "name": "AUTO_BACKUP_ON_UPDATE",
+          "value": "1"
+        },
+        {
+          "name": "AUTO_BACKUP_ON_SHUTDOWN",
+          "value": "1"
         }
     ],
     "essential": true,
@@ -156,5 +175,5 @@ DEFINITION
 
 resource "aws_s3_bucket" "backups" {
   bucket_prefix = "valheim-backup-${lower(var.world_name)}"
-  acl    = "private"
+  acl           = "private"
 }
