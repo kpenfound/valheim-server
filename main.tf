@@ -27,10 +27,10 @@ aws s3 sync s3://${aws_s3_bucket.backups.id}/ /home/ec2-user/valheim/
 (crontab -l 2>/dev/null; echo "${var.world_backup_schedule} aws s3 sync /home/ec2-user/valheim/ s3://${aws_s3_bucket.backups.id}/") | crontab -
 EOF
   instance_policy_actions = <<EOF
-	"s3:PutObject",
-	"s3:ListBucket",
-        "s3:GetObject",
-        "s3:DeleteObject",
+	"s3:Put*",
+	"s3:List*",
+        "s3:Get*",
+        "s3:Delete*",
 EOF
 }
 
