@@ -22,7 +22,7 @@ data "aws_subnet_ids" "default" {
 }
 
 module "ecs_cluster" {
-  source = "github.com/kpenfound/ecs-cluster?ref=1.1.2"
+  source = "github.com/kpenfound/ecs-cluster?ref=1.2.0"
 
   region            = var.region
   ecs_ami           = var.ecs_ami
