@@ -23,6 +23,7 @@ data "aws_subnet_ids" "default" {
 
 locals {
   user_data               = <<EOF
+pip3 install awscli
 aws s3 sync s3://${aws_s3_bucket.backups.id}/ /home/ec2-user/valheim/
 (crontab -l 2>/dev/null; echo "${var.world_backup_schedule} aws s3 sync /home/ec2-user/valheim/ s3://${aws_s3_bucket.backups.id}/") | crontab -
 EOF
