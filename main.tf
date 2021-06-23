@@ -21,16 +21,30 @@ data "aws_subnet_ids" "default" {
   vpc_id = aws_default_vpc.default.id
 }
 
-module "ecs_cluster" {
-  source = "github.com/kpenfound/ecs-cluster?ref=1.2.0"
+locals {
+  user_data               = <<EOF
+aws s3 sync s3://${aws_s3_bucket.backups.id}/ /home/ec2-user/valheim/
+(crontab -l 2>/dev/null; echo "${var.world_backup_schedule} aws s3 sync /home/ec2-user/valheim/ s3://${aws_s3_bucket.backups.id}/") | crontab -
+EOF
+  instance_policy_actions = <<EOF
+	"s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject",
+EOF
+}
 
-  region            = var.region
-  ecs_ami           = var.ecs_ami
-  ecs_instance_key  = var.key_name
-  ecs_instance_type = var.instance_type
-  cluster_name      = var.cluster_name
-  vpc_id            = aws_default_vpc.default.id
-  subnets           = data.aws_subnet_ids.default.ids
+module "ecs_cluster" {
+  source = "github.com/kpenfound/ecs-cluster?ref=1.2.2"
+
+  region                        = var.region
+  ecs_ami                       = var.ecs_ami
+  ecs_instance_key              = var.key_name
+  ecs_instance_type             = var.instance_type
+  cluster_name                  = var.cluster_name
+  vpc_id                        = aws_default_vpc.default.id
+  subnets                       = data.aws_subnet_ids.default.ids
+  extra_user_data               = local.user_data
+  extra_instance_policy_actions = local.instance_policy_actions
 }
 
 resource "aws_security_group_rule" "public_access" {
@@ -48,7 +62,7 @@ resource "aws_ecs_service" "service" {
   task_definition = aws_ecs_task_definition.task.arn
   desired_count   = 1
 
-  deployment_maximum_percent = 100
+  deployment_maximum_percent         = 100
   deployment_minimum_healthy_percent = 0
 
   ordered_placement_strategy {
