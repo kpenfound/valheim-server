@@ -28,6 +28,7 @@ aws s3 sync s3://${aws_s3_bucket.backups.id}/ /home/ec2-user/valheim/
 EOF
   instance_policy_actions = <<EOF
 	"s3:PutObject",
+	"s3:ListBucket",
         "s3:GetObject",
         "s3:DeleteObject",
 EOF
