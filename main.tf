@@ -23,15 +23,21 @@ data "aws_subnet_ids" "default" {
 
 locals {
   user_data               = <<EOF
-pip3 install awscli
-aws s3 sync s3://${aws_s3_bucket.backups.id}/ /home/ec2-user/valheim/
-(crontab -l 2>/dev/null; echo "${var.world_backup_schedule} aws s3 sync /home/ec2-user/valheim/ s3://${aws_s3_bucket.backups.id}/") | crontab -
+yum install -y unzip
+curl  -o awscliv2.zip https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+curl -o awscliv2.sig https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip.sig
+gpg --import ${var.awscli_gpg_key}
+gpg --verify awscliv2.sig awscliv2.zip
+unzip awscliv2.zip
+sh ./aws/install
+/usr/local/bin/aws s3 sync s3://${aws_s3_bucket.backups.id}/ /home/ec2-user/valheim/
+(crontab -l 2>/dev/null; echo "${var.world_backup_schedule} /usr/local/bin/aws s3 sync /home/ec2-user/valheim/ s3://${aws_s3_bucket.backups.id}/") | crontab -
 EOF
   instance_policy_actions = <<EOF
 	"s3:Put*",
 	"s3:List*",
-        "s3:Get*",
-        "s3:Delete*",
+  "s3:Get*",
+  "s3:Delete*",
 EOF
 }
 
