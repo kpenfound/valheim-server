@@ -1,8 +1,12 @@
 variable "region" {
   default = "us-east-1"
 }
+variable "vpc_id" {
+  default     = ""
+  description = "Optionally specify the vpc id to use instead of the default vpc"
+}
 variable "ecs_ami" {
-  default = "ami-0ec7896dee795dfa9"
+  default = "ami-0a5e7c9183d1cea27"
 }
 
 variable "instance_type" {
@@ -11,9 +15,6 @@ variable "instance_type" {
 
 variable "key_name" {
   description = "SSH key for ECS instance"
-}
-variable "cluster_name" {
-  default = "Valheim"
 }
 variable "task_cpu" {
   default = "1024"
