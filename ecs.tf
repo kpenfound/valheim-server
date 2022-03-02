@@ -1,9 +1,15 @@
 resource "aws_autoscaling_group" "ecs" {
   name                 = local.world
-  min_size             = var.cluster_min_size
-  max_size             = var.cluster_max_size
-  vpc_zone_identifier  = var.subnets
+  min_size             = 1
+  max_size             = 1
+  vpc_zone_identifier  = data.aws_subnet_ids.default.ids
   launch_configuration = aws_launch_configuration.ecs_instance.name
+
+  target_group_arns = [
+    aws_lb_target_group.fivesix.arn,
+    aws_lb_target_group.fiveseven.arn,
+    aws_lb_target_group.fiveeight.arn
+  ]
 
   lifecycle {
     create_before_destroy = true
@@ -81,7 +87,7 @@ resource "aws_iam_role_policy_attachment" "instance_policy_attach" {
 }
 
 resource "aws_launch_configuration" "ecs_instance" {
-  name                 = local.world
+  name_prefix          = local.world
   image_id             = var.ecs_ami
   instance_type        = var.instance_type
   key_name             = var.key_name
@@ -90,15 +96,13 @@ resource "aws_launch_configuration" "ecs_instance" {
   user_data = <<EOF
 #!/bin/bash
 echo ECS_CLUSTER=${local.world} >> /etc/ecs/ecs.config
-yum install -y unzip
-curl  -o awscliv2.zip https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
-curl -o awscliv2.sig https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip.sig
-gpg --import ${var.awscli_gpg_key}
-gpg --verify awscliv2.sig awscliv2.zip
-unzip awscliv2.zip
-sh ./aws/install
-/usr/local/bin/aws s3 sync s3://${aws_s3_bucket.backups.id}/ /home/ec2-user/valheim/
-(crontab -l 2>/dev/null; echo "${var.world_backup_schedule} /usr/local/bin/aws s3 sync /home/ec2-user/valheim/ s3://${aws_s3_bucket.backups.id}/") | crontab - 
+yum install -y awscli
+yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yum install -y nginx
+systemctl enable nginx
+systemctl start nginx
+/usr/bin/aws s3 sync s3://${aws_s3_bucket.backups.id}/ /home/ec2-user/valheim/
+(crontab -l 2>/dev/null; echo "${var.world_backup_schedule} /usr/bin/aws s3 sync /home/ec2-user/valheim/ s3://${aws_s3_bucket.backups.id}/") | crontab - 
 EOF
 
   security_groups = [aws_security_group.cluster_instance.id]
@@ -124,16 +128,16 @@ resource "aws_security_group" "cluster_instance" {
   }
 
   ingress {
-    from_port       = "0"
-    to_port         = "0"
-    protocol        = "-1"
-    security_groups = var.allowed_sgs
-  }
-
-  ingress {
     from_port   = "2456"
     to_port     = "2458"
     protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = "80"
+    to_port     = "80"
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -157,24 +161,6 @@ resource "aws_ecs_service" "service" {
   ordered_placement_strategy {
     type  = "binpack"
     field = "cpu"
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.fivesix.arn
-    container_name   = local.world
-    container_port   = 2456
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.fiveseven.arn
-    container_name   = local.world
-    container_port   = 2457
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.fiveeight.arn
-    container_name   = local.world
-    container_port   = 2458
   }
 }
 
@@ -246,7 +232,7 @@ resource "aws_ecs_task_definition" "task" {
     "essential": true,
     "image": "${var.docker_image}",
     "memoryReservation": ${var.task_memory},
-    "name": "${var.task_name}",
+    "name": "${local.world}",
     "portMappings": [
         {
             "containerPort": 2456,

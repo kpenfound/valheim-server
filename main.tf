@@ -28,7 +28,7 @@ resource "aws_default_vpc" "default" {
 }
 
 locals {
-  world  = "valheim-${random_pet.valheim}"
+  world  = "valheim-${random_pet.valheim.id}"
   vpc_id = var.vpc_id == "" ? aws_default_vpc.default.id : var.vpc_id
 }
 

@@ -12,6 +12,10 @@ resource "aws_lb_target_group" "fivesix" {
   port        = 2456
   protocol    = "UDP"
   vpc_id      = local.vpc_id
+
+  health_check {
+    port = "80"
+  }
 }
 
 resource "aws_lb_target_group" "fiveseven" {
@@ -19,6 +23,10 @@ resource "aws_lb_target_group" "fiveseven" {
   port        = 2457
   protocol    = "UDP"
   vpc_id      = local.vpc_id
+
+  health_check {
+    port = "80"
+  }
 }
 
 resource "aws_lb_target_group" "fiveeight" {
@@ -26,6 +34,10 @@ resource "aws_lb_target_group" "fiveeight" {
   port        = 2458
   protocol    = "UDP"
   vpc_id      = local.vpc_id
+
+  health_check {
+    port = "80"
+  }
 }
 
 resource "aws_lb_listener" "fivesix" {
