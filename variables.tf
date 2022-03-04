@@ -56,6 +56,10 @@ variable "world_update" {
 variable "world_update_schedule" {
   default = "0 6 * * *"
 }
+variable "world_sleep_timer" {
+  default = 60
+  description = "Number of minutes to wait before putting the server to sleep with no player activity"
+}
 variable "awscli_gpg_key" {
   default = <<EOF
   -----BEGIN PGP PUBLIC KEY BLOCK-----
