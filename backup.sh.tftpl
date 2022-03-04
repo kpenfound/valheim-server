@@ -1,0 +1,4 @@
+#!/bin/bash
+set -euo pipefail
+
+/usr/bin/aws s3 sync s3://${bucket_id}/ /home/ec2-user/valheim/
