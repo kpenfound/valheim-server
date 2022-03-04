@@ -83,15 +83,15 @@ resource "aws_iam_role_policy_attachment" "instance_policy_attach" {
 }
 
 locals {
-  script_idlecounter = templatefile("${path.module}/idlecounter.sh.tftpl",
+  script_idlecounter = base64encode(templatefile("${path.module}/idlecounter.sh.tftpl",
     {
       max_idle = var.world_sleep_timer,
       image = var.docker_image
-    })
-  script_backup = templatefile("${path.module}/backup.sh.tftpl",
+    }))
+  script_backup = base64encode(templatefile("${path.module}/backup.sh.tftpl",
   {
     bucket_id = aws_s3_bucket.backups.id
-  })
+  }))
 }
 
 resource "aws_launch_configuration" "ecs_instance" {
@@ -109,8 +109,8 @@ yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarc
 yum install -y nginx
 systemctl enable nginx
 systemctl start nginx
-echo ${local.script_backup} > /home/ec2-user/backup.sh
-echo ${local.script_idlecounter} > /home/ec2-user/idlecounter.sh
+echo ${local.script_backup} | base64 --decode > /home/ec2-user/backup.sh
+echo ${local.script_idlecounter} | base64 --decode > /home/ec2-user/idlecounter.sh
 /usr/bin/aws s3 sync s3://${aws_s3_bucket.backups.id}/ /home/ec2-user/valheim/
 (crontab -l 2>/dev/null; echo "${var.world_backup_schedule} sh /home/ec2-user/backup.sh") | crontab - 
 (crontab -l 2>/dev/null; echo "* * * * * sh /home/ec2-user/idlecounter.sh") | crontab - 
