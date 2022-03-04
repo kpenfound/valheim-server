@@ -16,7 +16,6 @@ import (
 func main() {
 	logger := log.New(os.Stdout, "[dummy-server] ", log.LstdFlags)
 
-	go tcpServer(logger)
 	udpServer(logger)
 }
 
@@ -49,43 +48,17 @@ func udpServer(logger *log.Logger) {
 	}
 }
 
-func tcpServer(logger *log.Logger) {
-	host := "0.0.0.0"
-	healthPort := 8080 // Healthcheck port
-
-	ip := net.ParseIP(host)
-
-	health, err := net.ListenTCP("tcp", &net.TCPAddr{IP: ip, Port: healthPort})
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer health.Close()
-	logger.Printf("health check listening on addr=%s", health.Addr())
-
-	for {
-		// TCP Listener
-		conn, err := health.Accept()
-		if err != nil {
-			panic(err)
-		}
-		logger.Printf("Received health check request")
-		go func(conn net.Conn) {
-			conn.Write([]byte("Health check good."))
-			conn.Close()
-		}(conn)
-	}
-}
-
 func enableRealServer() {
 	valheimService := os.Getenv("VALHEIM_SERVICE")
 	dummyService := os.Getenv("DUMMY_SERVICE")
 	cluster := os.Getenv("ECS_CLUSTER")
 	valheimAsg := os.Getenv("VALHEIM_ASG")
+	dummyAsg := os.Getenv("DUMMY_ASG")
 
 	changeAsgCount(valheimAsg, 1)
 	changeServiceCount(cluster, valheimService, 1)
 	changeServiceCount(cluster, dummyService, 0)
+	changeAsgCount(dummyAsg, 0)
 }
 
 func changeServiceCount(cluster string, service string, count int) {

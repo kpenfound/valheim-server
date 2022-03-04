@@ -2,7 +2,7 @@ resource "aws_lb" "nlb" {
   name               = local.world
   internal           = false
   load_balancer_type = "network"
-  subnets            = data.aws_subnet_ids.default.ids
+  subnets            = data.aws_subnets.default.ids
 
   enable_deletion_protection = true
 }

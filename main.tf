@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.0"
+      version = "~> 4.3.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -32,11 +32,18 @@ locals {
   vpc_id = var.vpc_id == "" ? aws_default_vpc.default.id : var.vpc_id
 }
 
-data "aws_subnet_ids" "default" {
-  vpc_id = local.vpc_id
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [local.vpc_id]
+  }
 }
 
 resource "aws_s3_bucket" "backups" {
   bucket_prefix = "valheim-backup-${lower(var.world_name)}"
-  acl           = "private"
+}
+
+resource "aws_s3_bucket_acl" "backups" {
+  bucket = aws_s3_bucket.backups.id
+  acl    = "private"
 }

@@ -1,22 +1,3 @@
-resource "aws_autoscaling_group" "ecs" {
-  name                 = local.world
-  min_size             = 0
-  max_size             = 1
-  desired_capacity     = 1
-  vpc_zone_identifier  = data.aws_subnet_ids.default.ids
-  launch_configuration = aws_launch_configuration.ecs_instance.name
-
-  target_group_arns = [
-    aws_lb_target_group.fivesix.arn,
-    aws_lb_target_group.fiveseven.arn,
-    aws_lb_target_group.fiveeight.arn
-  ]
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "aws_ecs_cluster" "cluster" {
   name = local.world
 }
@@ -64,6 +45,7 @@ resource "aws_iam_policy" "instance_policy" {
           "ecs:RegisterContainerInstance",
           "ecs:StartTelemetrySession",
           "ecs:UpdateContainerInstancesState",
+          "ecs:UpdateService",
           "ecs:Submit*",
           "ecr:GetAuthorizationToken",
           "ecr:BatchCheckLayerAvailability",
@@ -74,7 +56,8 @@ resource "aws_iam_policy" "instance_policy" {
           "s3:List*",
           "s3:Get*",
           "s3:Delete*",
-          "logs:PutLogEvents"
+          "logs:PutLogEvents",
+          "autoscaling:UpdateAutoScalingGroup",
         ],
         "Resource" = "*"
       }

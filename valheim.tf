@@ -3,11 +3,12 @@ locals {
   script_idlecounter = base64encode(templatefile("${path.module}/idlecounter.sh.tftpl",
     {
       max_idle        = var.world_sleep_timer,
-      image           = var.docker_image
-      ecs_cluster     = aws_ecs_cluster.cluster.name
-      valheim_service = aws_ecs_service.valheim.name
-      dummy_service   = aws_ecs_service.dummy.name
-      asg_gameserver  = aws_autoscaling_group.ecs.name
+      image           = var.docker_image,
+      ecs_cluster     = aws_ecs_cluster.cluster.name,
+      valheim_service = aws_ecs_service.valheim.name,
+      dummy_service   = aws_ecs_service.dummy.name,
+      asg_gameserver  = local.world,
+      asg_dummy       = "dummy-${local.world}"
   }))
   script_backup = base64encode(templatefile("${path.module}/backup.sh.tftpl",
     {
@@ -16,7 +17,27 @@ locals {
   script_setup_healthcheck = file("${path.module}/setup_healthcheck.sh")
 }
 
-resource "aws_launch_configuration" "ecs_instance" {
+resource "aws_autoscaling_group" "valheim" {
+  name                 = local.world
+  min_size             = 0
+  max_size             = 1
+  desired_capacity     = 1
+  vpc_zone_identifier  = data.aws_subnets.default.ids
+  launch_configuration = aws_launch_configuration.valheim.name
+
+  target_group_arns = [
+    aws_lb_target_group.fivesix.arn,
+    aws_lb_target_group.fiveseven.arn,
+    aws_lb_target_group.fiveeight.arn
+  ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+
+resource "aws_launch_configuration" "valheim" {
   name_prefix          = local.world
   image_id             = var.ecs_ami
   instance_type        = var.instance_type

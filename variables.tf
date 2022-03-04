@@ -13,6 +13,10 @@ variable "instance_type" {
   default = "m5.large"
 }
 
+variable "dummy_instance_type" {
+  default = "t3.nano"
+}
+
 variable "key_name" {
   description = "SSH key for ECS instance"
 }
