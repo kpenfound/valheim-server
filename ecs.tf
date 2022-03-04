@@ -92,6 +92,7 @@ locals {
   {
     bucket_id = aws_s3_bucket.backups.id
   }))
+  script_setup_healthcheck = file("${path.module}/setup_healthcheck.sh")
 }
 
 resource "aws_launch_configuration" "ecs_instance" {
@@ -105,10 +106,7 @@ resource "aws_launch_configuration" "ecs_instance" {
 #!/bin/bash
 echo ECS_CLUSTER=${local.world} >> /etc/ecs/ecs.config
 yum install -y awscli
-yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-yum install -y nginx
-systemctl enable nginx
-systemctl start nginx
+${local.script_setup_heatlhcheck}
 echo ${local.script_backup} | base64 --decode > /home/ec2-user/backup.sh
 echo ${local.script_idlecounter} | base64 --decode > /home/ec2-user/idlecounter.sh
 /usr/bin/aws s3 sync s3://${aws_s3_bucket.backups.id}/ /home/ec2-user/valheim/
