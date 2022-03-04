@@ -17,11 +17,11 @@ variable "key_name" {
   description = "SSH key for ECS instance"
 }
 variable "task_cpu" {
-  type = number
+  type    = number
   default = 1024
 }
 variable "task_memory" {
-  type = number
+  type    = number
   default = 1024
 }
 variable "task_name" {
@@ -57,7 +57,7 @@ variable "world_update_schedule" {
   default = "0 6 * * *"
 }
 variable "world_sleep_timer" {
-  default = 60
+  default     = 60
   description = "Number of minutes to wait before putting the server to sleep with no player activity"
 }
 variable "awscli_gpg_key" {

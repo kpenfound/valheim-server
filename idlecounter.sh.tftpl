@@ -32,4 +32,8 @@ if [ $players > ${max_idle} ]; then
   echo "Shutting down"
   sh /home/ec2-user/backup.sh
   # set dummy listener
+  aws ecs update-service --cluster ${ecs_cluster} --service ${valheim_service} --desired-capacity 0
+  aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${asg_gameserver} --desired-capacity 0
+  aws ecs update-service --cluster ${ecs_cluster} --service ${dummy_service} --desired-capacity 1
+  shutdown -h now
 fi

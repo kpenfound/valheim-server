@@ -16,6 +16,11 @@ resource "aws_lb_target_group" "fivesix" {
   health_check {
     port = "80"
   }
+
+  stickiness {
+    type    = "source_ip"
+    enabled = false
+  }
 }
 
 resource "aws_lb_target_group" "fiveseven" {
@@ -27,6 +32,11 @@ resource "aws_lb_target_group" "fiveseven" {
   health_check {
     port = "80"
   }
+
+  stickiness {
+    type    = "source_ip"
+    enabled = false
+  }
 }
 
 resource "aws_lb_target_group" "fiveeight" {
@@ -37,6 +47,11 @@ resource "aws_lb_target_group" "fiveeight" {
 
   health_check {
     port = "80"
+  }
+
+  stickiness {
+    type    = "source_ip"
+    enabled = false
   }
 }
 
