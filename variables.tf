@@ -37,7 +37,7 @@ variable "docker_image" {
 variable "world_name" {}
 variable "world_password" {}
 variable "world_public" {
-  default = "0"
+  default = "1"
 }
 variable "world_tz" {
   default = "America/Chicago"
