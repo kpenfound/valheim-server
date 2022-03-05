@@ -15,8 +15,9 @@ resource "aws_lb_target_group" "fivesix" {
   deregistration_delay = 0
 
   health_check {
-    port              = "80"
-    healthy_threshold = 2
+    port                = "80"
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
   }
 
   stickiness {
@@ -33,8 +34,9 @@ resource "aws_lb_target_group" "fiveseven" {
   deregistration_delay = 0
 
   health_check {
-    port              = "80"
-    healthy_threshold = 2
+    port                = "80"
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
   }
 
   stickiness {
@@ -51,8 +53,9 @@ resource "aws_lb_target_group" "fiveeight" {
   deregistration_delay = 0
 
   health_check {
-    port              = "80"
-    healthy_threshold = 2
+    port                = "80"
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
   }
 
   stickiness {
