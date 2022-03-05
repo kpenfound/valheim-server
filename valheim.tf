@@ -1,6 +1,6 @@
 
 locals {
-  script_idlecounter = base64encode(templatefile("${path.module}/idlecounter.sh.tftpl",
+  script_idlecounter = base64encode(templatefile("${path.module}/scripts/idlecounter.sh.tftpl",
     {
       max_idle        = var.world_sleep_timer,
       image           = var.docker_image,
@@ -12,11 +12,11 @@ locals {
       asg_gameserver  = local.world,
       asg_dummy       = "dummy-${local.world}"
   }))
-  script_backup = base64encode(templatefile("${path.module}/backup.sh.tftpl",
+  script_backup = base64encode(templatefile("${path.module}/scripts/backup.sh.tftpl",
     {
       bucket_id = aws_s3_bucket.backups.id
   }))
-  script_setup_healthcheck = file("${path.module}/setup_healthcheck.sh")
+  script_setup_healthcheck = file("${path.module}/scripts/setup_healthcheck.sh")
 }
 
 resource "aws_autoscaling_group" "valheim" {
