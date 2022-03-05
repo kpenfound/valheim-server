@@ -1,6 +1,10 @@
+resource "aws_ecs_cluster" "dummy" {
+  name = "dummy-${local.world}"
+}
+
 resource "aws_ecs_service" "dummy" {
   name            = "dummy-${local.world}"
-  cluster         = aws_ecs_cluster.cluster.name
+  cluster         = aws_ecs_cluster.dummy.name
   task_definition = aws_ecs_task_definition.dummy.arn
   desired_count   = 0
 
@@ -15,24 +19,49 @@ resource "aws_ecs_service" "dummy" {
 }
 
 resource "aws_ecs_task_definition" "dummy" {
-  family       = "dummy"
+  family       = "dummy-${local.world}"
   network_mode = "bridge"
   cpu          = 256
-  memory       = 512
+  memory       = 256
 
   container_definitions = jsonencode([
     {
       "name"      = "dummy",
-      "image"     = "kpenfound/valheim-dummy:latest",
+      "image"     = "kylepenfound/valheim-dummy:latest",
       "cpu"       = 256,
-      "memory"    = 512,
+      "memory"    = 256,
       "essential" = true,
-      "portMappings" = [
+      "environment" = [
         {
-          "containerPort" = 80,
-          "hostPort"      = 80,
-          "protocol"      = "tcp"
+          "name"  = "VALHEIM_SERVICE",
+          "value" = local.world
         },
+        {
+          "name"  = "DUMMY_SERVICE",
+          "value" = "dummy-${local.world}"
+        },
+        {
+          "name"  = "VALHEIM_CLUSTER",
+          "value" = local.world
+        },
+        {
+          "name"  = "DUMMY_CLUSTER",
+          "value" = "dummy-${local.world}"
+        },
+        {
+          "name"  = "VALHEIM_ASG",
+          "value" = local.world
+        },
+        {
+          "name"  = "DUMMY_ASG",
+          "value" = "dummy-${local.world}"
+        },
+        {
+          "name"  = "AWS_REGION",
+          "value" = var.region
+        }
+      ],
+      "portMappings" = [
         {
           "containerPort" = 2457,
           "hostPort"      = 2457,
@@ -71,7 +100,7 @@ resource "aws_launch_configuration" "dummy" {
 
   user_data = <<EOF
 #!/bin/bash
-echo ECS_CLUSTER=${local.world} >> /etc/ecs/ecs.config
+echo ECS_CLUSTER=dummy-${local.world} >> /etc/ecs/ecs.config
 yum install -y awscli
 ${local.script_setup_healthcheck}
 EOF

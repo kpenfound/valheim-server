@@ -51,18 +51,22 @@ func udpServer(logger *log.Logger) {
 func enableRealServer() {
 	valheimService := os.Getenv("VALHEIM_SERVICE")
 	dummyService := os.Getenv("DUMMY_SERVICE")
-	cluster := os.Getenv("ECS_CLUSTER")
+	valheimCluster := os.Getenv("VALHEIM_CLUSTER")
+	dummyCluster := os.Getenv("DUMMY_CLUSTER")
 	valheimAsg := os.Getenv("VALHEIM_ASG")
 	dummyAsg := os.Getenv("DUMMY_ASG")
 
 	changeAsgCount(valheimAsg, 1)
-	changeServiceCount(cluster, valheimService, 1)
-	changeServiceCount(cluster, dummyService, 0)
+	changeServiceCount(valheimCluster, valheimService, 1)
+	changeServiceCount(dummyCluster, dummyService, 0)
 	changeAsgCount(dummyAsg, 0)
 }
 
 func changeServiceCount(cluster string, service string, count int) {
-	svc := ecs.New(session.New())
+	region := os.Getenv("AWS_REGION")
+	svc := ecs.New(session.New(&aws.Config{
+		Region: aws.String(region),
+	}))
 	input := &ecs.UpdateServiceInput{
 			DesiredCount: aws.Int64(int64(count)),
 			Service:      aws.String(service),
@@ -106,13 +110,16 @@ func changeServiceCount(cluster string, service string, count int) {
 }
 
 func changeAsgCount(asg string, count int) {
-	svc := autoscaling.New(session.New())
-	input := &autoscaling.UpdateAutoScalingGroupInput{
+	region := os.Getenv("AWS_REGION")
+	svc := autoscaling.New(session.New(&aws.Config{
+		Region: aws.String(region),
+	}))
+	input := &autoscaling.SetDesiredCapacityInput{
 			AutoScalingGroupName: aws.String(asg),
 			DesiredCapacity:      aws.Int64(int64(count)),
 	}
 	
-	result, err := svc.UpdateAutoScalingGroup(input)
+	result, err := svc.SetDesiredCapacity(input)
 	if err != nil {
 			if aerr, ok := err.(awserr.Error); ok {
 					switch aerr.Code() {

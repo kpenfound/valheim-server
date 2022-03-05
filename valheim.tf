@@ -4,9 +4,11 @@ locals {
     {
       max_idle        = var.world_sleep_timer,
       image           = var.docker_image,
-      ecs_cluster     = aws_ecs_cluster.cluster.name,
+      valheim_cluster = aws_ecs_cluster.cluster.name,
+      dummy_cluster   = aws_ecs_cluster.dummy.name,
       valheim_service = aws_ecs_service.valheim.name,
       dummy_service   = aws_ecs_service.dummy.name,
+      region          = var.region
       asg_gameserver  = local.world,
       asg_dummy       = "dummy-${local.world}"
   }))

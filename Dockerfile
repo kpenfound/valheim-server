@@ -4,11 +4,12 @@ WORKDIR /go/src/github.com/kpenfound/valheim-server/
 COPY dummy.go ./
 COPY go.mod ./
 COPY go.sum ./
-RUN GOOS=linux go build -o dummy .
+RUN GOOS=linux go build -o dummy
 
-FROM alpine:latest
+FROM debian:bookworm-slim
+RUN apt update
+RUN apt install -y ca-certificates
 EXPOSE 2457/udp
-RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 COPY --from=0 /go/src/github.com/kpenfound/valheim-server/dummy ./
 CMD ["./dummy"] 

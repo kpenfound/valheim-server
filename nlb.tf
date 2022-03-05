@@ -8,13 +8,15 @@ resource "aws_lb" "nlb" {
 }
 
 resource "aws_lb_target_group" "fivesix" {
-  name_prefix = "vlbtg"
-  port        = 2456
-  protocol    = "UDP"
-  vpc_id      = local.vpc_id
+  name_prefix          = "vlbtg"
+  port                 = 2456
+  protocol             = "UDP"
+  vpc_id               = local.vpc_id
+  deregistration_delay = 0
 
   health_check {
-    port = "80"
+    port              = "80"
+    healthy_threshold = 2
   }
 
   stickiness {
@@ -24,13 +26,15 @@ resource "aws_lb_target_group" "fivesix" {
 }
 
 resource "aws_lb_target_group" "fiveseven" {
-  name_prefix = "vlbtg"
-  port        = 2457
-  protocol    = "UDP"
-  vpc_id      = local.vpc_id
+  name_prefix          = "vlbtg"
+  port                 = 2457
+  protocol             = "UDP"
+  vpc_id               = local.vpc_id
+  deregistration_delay = 0
 
   health_check {
-    port = "80"
+    port              = "80"
+    healthy_threshold = 2
   }
 
   stickiness {
@@ -40,13 +44,15 @@ resource "aws_lb_target_group" "fiveseven" {
 }
 
 resource "aws_lb_target_group" "fiveeight" {
-  name_prefix = "vlbtg"
-  port        = 2458
-  protocol    = "UDP"
-  vpc_id      = local.vpc_id
+  name_prefix          = "vlbtg"
+  port                 = 2458
+  protocol             = "UDP"
+  vpc_id               = local.vpc_id
+  deregistration_delay = 0
 
   health_check {
-    port = "80"
+    port              = "80"
+    healthy_threshold = 2
   }
 
   stickiness {

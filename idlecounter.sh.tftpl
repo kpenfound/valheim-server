@@ -28,12 +28,11 @@ fi
 # save counter
 echo $idleminutes > $idlefile
 
-if [ $players > ${max_idle} ]; then
+if (( $idleminutes >= ${max_idle} )); then
   echo "Shutting down"
   sh /home/ec2-user/backup.sh
-  aws ecs update-service --cluster ${ecs_cluster} --service ${valheim_service} --desired-capacity 0
-  aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${asg_gameserver} --desired-capacity 0
-  aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${asg_dummy} --desired-capacity 1
-  aws ecs update-service --cluster ${ecs_cluster} --service ${dummy_service} --desired-capacity 1
-  shutdown -h now
+  aws ecs update-service --region ${region} --cluster ${valheim_cluster} --service ${valheim_service} --desired-count 0
+  aws autoscaling set-desired-capacity --region ${region} --auto-scaling-group-name ${asg_gameserver} --desired-capacity 0
+  aws autoscaling set-desired-capacity --region ${region} --auto-scaling-group-name ${asg_dummy} --desired-capacity 1
+  aws ecs update-service --region ${region} --cluster ${dummy_cluster} --service ${dummy_service} --desired-count 1
 fi

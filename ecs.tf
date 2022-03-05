@@ -58,6 +58,7 @@ resource "aws_iam_policy" "instance_policy" {
           "s3:Delete*",
           "logs:PutLogEvents",
           "autoscaling:UpdateAutoScalingGroup",
+          "autoscaling:SetDesiredCapacity",
         ],
         "Resource" = "*"
       }
