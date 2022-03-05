@@ -2,3 +2,5 @@ terraform.auto.tfvars
 *.lock*
 *tfstate*
 .terraform
+
+dummy
