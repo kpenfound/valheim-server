@@ -1,17 +1,5 @@
 
 locals {
-  script_idlecounter = base64encode(templatefile("${path.module}/scripts/idlecounter.sh.tftpl",
-    {
-      max_idle        = var.world_sleep_timer,
-      image           = var.docker_image,
-      valheim_cluster = aws_ecs_cluster.cluster.name,
-      dummy_cluster   = aws_ecs_cluster.dummy.name,
-      valheim_service = aws_ecs_service.valheim.name,
-      dummy_service   = aws_ecs_service.dummy.name,
-      region          = var.region
-      asg_gameserver  = local.world,
-      asg_dummy       = "dummy-${local.world}"
-  }))
   script_backup = base64encode(templatefile("${path.module}/scripts/backup.sh.tftpl",
     {
       bucket_id = aws_s3_bucket.backups.id
@@ -52,7 +40,6 @@ echo ECS_CLUSTER=${local.world} >> /etc/ecs/ecs.config
 yum install -y awscli
 ${local.script_setup_healthcheck}
 echo ${local.script_backup} | base64 --decode > /home/ec2-user/backup.sh
-echo ${local.script_idlecounter} | base64 --decode > /home/ec2-user/idlecounter.sh
 /usr/bin/aws s3 sync s3://${aws_s3_bucket.backups.id}/ /home/ec2-user/valheim/
 (crontab -l 2>/dev/null; echo "${var.world_backup_schedule} sh /home/ec2-user/backup.sh") | crontab - 
 (crontab -l 2>/dev/null; echo "* * * * * sh /home/ec2-user/idlecounter.sh") | crontab - 

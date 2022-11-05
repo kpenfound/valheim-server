@@ -1,6 +1,11 @@
-# Valheim Terraform
+# Valheim Terraform Module
 
-### Instructions:
+## Features
+
+- Run a private Valheim server on AWS ECS
+- Automatically backup worlds to s3
+
+## Instructions:
 - Create a directory for your local terraform state, such as `valheim-terraform`
 - Create `main.tf` like so:
 ```
@@ -21,15 +26,8 @@ module "valheim-server" {
 - Open valheim, select the server, and click connect!
 
 
-### Important notes
+## Important notes
 The default ecs_ami is the current ecs optimized ami in us-east-1.  You will
 have to change this for other regions. Refer to this list: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
 
-This is using the docker image maintained by mbround18 at https://hub.docker.com/r/mbround18/valheim
-
-### Auto Sleep
-Automatically shuts off the server after 0 players have been connected for a set amount of time.
-
-The next time a player tries to connect through steam, the server will be started back up and will be available shortly after. Players will have to know to wait a minute after the first connection fails and to try again if the server had been sleeping.
-
-Override the timer value at `world_sleep_timer` (default 60 minutes). Set to an unrealistically high number to disable.
+This is possible thanks to the docker image maintained by mbround18 at https://github.com/mbround18/valheim-docker

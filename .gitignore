@@ -3,4 +3,3 @@ terraform.auto.tfvars
 *tfstate*
 .terraform
 
-dummy
