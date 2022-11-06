@@ -28,7 +28,10 @@ variable "task_name" {
   default = "valheim"
 }
 variable "docker_image" {
-  default = "mbround18/valheim:latest"
+  default = "mbround18/valheim"
+}
+variable "docker_image_version" {
+  default = "latest"
 }
 variable "world_name" {}
 variable "world_password" {}

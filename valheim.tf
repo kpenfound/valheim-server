@@ -165,7 +165,7 @@ resource "aws_ecs_task_definition" "valheim" {
         }
       ],
       "essential"         = true,
-      "image"             = var.docker_image,
+      "image"             = "${var.docker_image}:${var.docker_image_version}",
       "memoryReservation" = var.task_memory,
       "name"              = local.world,
       "portMappings" = [
